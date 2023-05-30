@@ -1,6 +1,7 @@
 name: keystore_strongbox
-description: A new Flutter plugin project.
+description: encryption and decryption plugin utilizing a keystore that leverages strongbox
 version: 0.0.1
+homepage: https://www.saddamnur.xyz/
 
 environment:
   sdk: '>=2.18.6 <3.0.0'
