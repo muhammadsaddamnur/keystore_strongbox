@@ -2,9 +2,6 @@ import 'dart:developer';
 
 import 'package:biometricx/biometricx.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:keystore_strongbox/keystore_strongbox.dart';
 
 void main() {
@@ -13,60 +10,39 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   final _keystoreStrongboxPlugin = KeystoreStrongbox();
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion = await _keystoreStrongboxPlugin.getPlatformVersion() ??
-          'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
-  migrate() async {
-    /// coba cari iv dengan current user di keystore baru
-    /// kalo null ambil iv dari keystore lama pindah ke keystore baru
-    var baru = await _keystoreStrongboxPlugin.getIV(
-      key: "dam",
+  /// Migrates the initialization vector (IV) from the old keystore to the new keystore.
+  void migrate() async {
+    /// Try to find the IV with the current user in the new keystore
+    /// If it's null, retrieve the IV from the old keystore and migrate it to the new keystore
+    var newIV = await _keystoreStrongboxPlugin.getIV(
+      key: "indonesia",
     );
-    log(baru.toString());
-    if (baru != null) return;
-    var lama = await _keystoreStrongboxPlugin.getIV(
-      key: "dam",
+    log(newIV.toString());
+    if (newIV != null) return;
+
+    var oldIV = await _keystoreStrongboxPlugin.getIV(
+      key: "indonesia",
       sharedPreferences: 'com.salkuadrat.biometricx',
     );
-    if (lama == null) return;
+    if (oldIV == null) return;
+
     await _keystoreStrongboxPlugin.setIV(
-      key: 'dam',
-      value: lama,
+      key: 'indonesia',
+      value: oldIV,
     );
   }
 
@@ -81,59 +57,46 @@ class _MyAppState extends State<MyApp> {
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
-              Center(
-                child: Text('Running on: $_platformVersion\n'),
-              ),
               ElevatedButton(
                 onPressed: () async {
                   var res = await BiometricX.encrypt(
                     userAuthenticationRequired: false,
                     storeSharedPreferences: false,
-                    tag: 'dam',
+                    tag: 'indonesia',
                     returnCipher: true,
-                    messageKey: 'saddam',
-                    message: 'saddam',
+                    messageKey: 'bali',
+                    message: 'bali',
                   );
-                  log('x ' + res.data.toString());
+                  log('x ${res.data}');
                 },
-                child: Text('Encrypt Lama'),
+                child: const Text('Encrypt OLD'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   var s = await _keystoreStrongboxPlugin.encrypt(
-                    tag: 'dam',
-                    message: 'saddam',
+                    tag: 'indonesia',
+                    message: 'bali',
                   );
 
-                  log('s ' + s.toString());
+                  log('s $s');
                 },
-                child: Text('Encrypt Baru'),
+                child: const Text('Encrypt NEW'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   var s = await _keystoreStrongboxPlugin.decrypt(
-                    tag: 'dam',
-                    message: 'xLGFc++JfdtswrlQsGUFsWtdcRDaPQ==',
+                    tag: 'indonesia',
+                    message: 'va8YJOC3HXI0bZ/vURdXZnX7Xfs=',
                   );
-
-                  // var res = await BiometricX.decrypt(
-                  //   userAuthenticationRequired: false,
-                  //   storeSharedPreferences: false,
-                  //   tag: 'dam',
-                  //   cipherText: 'zrWht6XB2Hk147kORB4gRpost2DxMw==',
-                  //   messageKey: 'saddam',
-                  // );
-
-                  log('s ' + s.toString());
-                  // log('x ' + res.data.toString());
+                  log('s $s');
                 },
-                child: Text('Decrypt'),
+                child: const Text('Decrypt'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   migrate();
                 },
-                child: Text('Migrate'),
+                child: const Text('Migrate'),
               ),
             ],
           ),
