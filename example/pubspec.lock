@@ -9,6 +9,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.10.0"
+  biometricx:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "947efec098d5774a7d8adeef075a840b09f61b7b"
+      url: "https://github.com/muhammadsaddamnur/BiometricX.git"
+    source: git
+    version: "0.0.2"
   boolean_selector:
     dependency: transitive
     description:

@@ -24,8 +24,9 @@ class MethodChannelKeystoreStrongbox extends KeystoreStrongboxPlatform {
   Future<String?> encrypt({
     required String tag,
     required String message,
+    required String sharedPreferences,
   }) async {
-    var iv = await getIV(key: tag);
+    var iv = await getIV(key: tag, sharedPreferences: sharedPreferences);
     log('iv sp : $iv');
 
     final res = await methodChannel.invokeMethod<String?>(
@@ -42,7 +43,11 @@ class MethodChannelKeystoreStrongbox extends KeystoreStrongboxPlatform {
     if (iv == null) {
       log('iv new : ${jsonRes['iv']}');
 
-      await setIV(key: tag, value: jsonRes['iv']);
+      await setIV(
+        key: tag,
+        value: jsonRes['iv'],
+        sharedPreferences: sharedPreferences,
+      );
     }
 
     return jsonRes['ciphertext'];
@@ -52,8 +57,9 @@ class MethodChannelKeystoreStrongbox extends KeystoreStrongboxPlatform {
   Future<String?> decrypt({
     required String tag,
     required String message,
+    required String sharedPreferences,
   }) async {
-    var iv = await getIV(key: tag);
+    var iv = await getIV(key: tag, sharedPreferences: sharedPreferences);
     log('iv sp : $iv');
 
     final res = await methodChannel.invokeMethod<String?>(
@@ -68,11 +74,15 @@ class MethodChannelKeystoreStrongbox extends KeystoreStrongboxPlatform {
     return jsonRes['plainText'];
   }
 
-  Future<bool?> setIV({required String key, required String value}) async {
+  Future<bool?> setIV({
+    required String key,
+    required String value,
+    required String sharedPreferences,
+  }) async {
     final res = await methodChannel.invokeMethod<bool?>(
       'storeSharedPreferences',
       {
-        'sharedPreferenceName': 'com.salkuadrat.biometricx',
+        'sharedPreferenceName': sharedPreferences,
         'tag': key,
         'message': value,
       },
@@ -80,11 +90,14 @@ class MethodChannelKeystoreStrongbox extends KeystoreStrongboxPlatform {
     return res;
   }
 
-  Future<String?> getIV({required String key}) async {
+  Future<String?> getIV({
+    required String key,
+    required String sharedPreferences,
+  }) async {
     final res = await methodChannel.invokeMethod<String?>(
       'loadSharedPreferences',
       {
-        'sharedPreferenceName': 'com.salkuadrat.biometricx',
+        'sharedPreferenceName': sharedPreferences,
         'tag': key,
       },
     );

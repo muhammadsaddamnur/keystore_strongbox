@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:biometricx/biometricx.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -50,6 +51,25 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  migrate() async {
+    /// coba cari iv dengan current user di keystore baru
+    /// kalo null ambil iv dari keystore lama pindah ke keystore baru
+    var baru = await _keystoreStrongboxPlugin.getIV(
+      key: "dam",
+    );
+    log(baru.toString());
+    if (baru != null) return;
+    var lama = await _keystoreStrongboxPlugin.getIV(
+      key: "dam",
+      sharedPreferences: 'com.salkuadrat.biometricx',
+    );
+    if (lama == null) return;
+    await _keystoreStrongboxPlugin.setIV(
+      key: 'dam',
+      value: lama,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -66,21 +86,54 @@ class _MyAppState extends State<MyApp> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  var s = await _keystoreStrongboxPlugin.encrypt(
-                      tag: 'dam', message: 'saddam');
-                  log(s.toString());
+                  var res = await BiometricX.encrypt(
+                    userAuthenticationRequired: false,
+                    storeSharedPreferences: false,
+                    tag: 'dam',
+                    returnCipher: true,
+                    messageKey: 'saddam',
+                    message: 'saddam',
+                  );
+                  log('x ' + res.data.toString());
                 },
-                child: Text('Encrypt'),
+                child: Text('Encrypt Lama'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  var s = await _keystoreStrongboxPlugin.encrypt(
+                    tag: 'dam',
+                    message: 'saddam',
+                  );
+
+                  log('s ' + s.toString());
+                },
+                child: Text('Encrypt Baru'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   var s = await _keystoreStrongboxPlugin.decrypt(
                     tag: 'dam',
-                    message: 'M6D1KXYnO/eH+26BFM0WxX6b7dXwXw==',
+                    message: 'xLGFc++JfdtswrlQsGUFsWtdcRDaPQ==',
                   );
-                  log(s.toString());
+
+                  // var res = await BiometricX.decrypt(
+                  //   userAuthenticationRequired: false,
+                  //   storeSharedPreferences: false,
+                  //   tag: 'dam',
+                  //   cipherText: 'zrWht6XB2Hk147kORB4gRpost2DxMw==',
+                  //   messageKey: 'saddam',
+                  // );
+
+                  log('s ' + s.toString());
+                  // log('x ' + res.data.toString());
                 },
                 child: Text('Decrypt'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  migrate();
+                },
+                child: Text('Migrate'),
               ),
             ],
           ),

@@ -11,14 +11,38 @@ class MockKeystoreStrongboxPlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<String?> encrypt({required String tag, required String message}) {
+  Future<String?> encrypt({
+    required String tag,
+    required String message,
+    required String sharedPreferences,
+  }) {
     // TODO: implement encrypt
     throw UnimplementedError();
   }
 
   @override
-  Future<String?> decrypt({required String tag, required String message}) {
+  Future<String?> decrypt({
+    required String tag,
+    required String message,
+    required String sharedPreferences,
+  }) {
     // TODO: implement decrypt
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> getIV(
+      {required String key, required String sharedPreferences}) {
+    // TODO: implement getIV
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool?> setIV(
+      {required String key,
+      required String value,
+      required String sharedPreferences}) {
+    // TODO: implement setIV
     throw UnimplementedError();
   }
 }

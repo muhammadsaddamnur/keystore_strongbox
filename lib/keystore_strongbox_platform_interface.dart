@@ -27,14 +27,30 @@ abstract class KeystoreStrongboxPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<String?> encrypt({required String tag, required String message}) {
+  Future<String?> encrypt({
+    required String tag,
+    required String message,
+    required String sharedPreferences,
+  }) {
     throw UnimplementedError('encrypt() has not been implemented.');
   }
 
   Future<String?> decrypt({
     required String tag,
     required String message,
+    required String sharedPreferences,
   }) {
     throw UnimplementedError('decrypt() has not been implemented.');
   }
+
+  Future<bool?> setIV({
+    required String key,
+    required String value,
+    required String sharedPreferences,
+  });
+
+  Future<String?> getIV({
+    required String key,
+    required String sharedPreferences,
+  });
 }
