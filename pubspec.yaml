@@ -1,6 +1,6 @@
 name: keystore_strongbox
 description: encryption and decryption plugin utilizing a keystore that leverages strongbox
-version: 0.0.1
+version: 0.0.2
 homepage: https://www.saddamnur.xyz/
 
 environment:
